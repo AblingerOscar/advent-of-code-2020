@@ -4,10 +4,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="GeneralLib.fs" />
+    <ProjectReference Include="..\lib\lib.fsproj">
+      <Name>lib.fsproj</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Program.fs" />
-    <Content Include="data\*.*">
+    <Content Include="data/*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>  
+    </Content>
   </ItemGroup>
 </Project>

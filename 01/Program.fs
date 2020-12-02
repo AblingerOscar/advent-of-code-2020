@@ -1,5 +1,5 @@
 ﻿open System
-open GL
+open Lib
 
 let firstPart (numbers: list<int>) =
     let rec allPairs l = seq {
