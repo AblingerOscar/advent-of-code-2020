@@ -24,12 +24,11 @@ let getData () =
 
 let step dx dy forest x y =
     let rec stepR (forest: Forest) x y cnt =
-        if forest.IsEnd y then
-            cnt
-        else if forest.IsTree x y then
-            stepR forest (x+dx) (y+dy) (cnt+1)
-        else
-            stepR forest (x+dx) (y+dy) cnt
+        match (forest.IsEnd y, forest.IsTree x y) with
+        | true, _ -> cnt
+        | _, true -> stepR forest (x+dx) (y+dy) (cnt+1)
+        | _, false -> stepR forest (x+dx) (y+dy) cnt
+
     stepR forest x y 0
 
 [<EntryPoint>]
