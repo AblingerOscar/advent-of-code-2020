@@ -18,10 +18,10 @@ let parsePassword group =
     try
         match group with
         | [_; min; max; letter; input] -> Some (Password(
-                                                Int32.Parse min,
-                                                Int32.Parse  max,
-                                                Seq.map char letter |> Seq.head,
-                                                input))
+                                                    Int32.Parse min,
+                                                    Int32.Parse  max,
+                                                    Seq.map char letter |> Seq.head,
+                                                    input))
         | _ -> None
     with
         _ -> None
