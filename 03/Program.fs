@@ -1,12 +1,10 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open System.Collections
+﻿open System.Collections
 open Lib
 
 type Forest (bitArrays: BitArray list) =
     let height = bitArrays.Length
     let width = bitArrays.Head.Length
-    member _this.IsEnd y = y >= height
+    member _.IsEnd y = y >= height
     member _.IsTree x y = bitArrays.[y].[x % width]
 
 let getData () = 
