@@ -11,6 +11,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "lib", "lib\lib.fsproj", "{6
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc03", "03\aoc03.fsproj", "{1EDF4CE3-0857-4AD9-A711-F42AD1FBB15D}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc04", "04\aoc04.fsproj", "{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,17 @@ Global
 		{1EDF4CE3-0857-4AD9-A711-F42AD1FBB15D}.Release|x64.Build.0 = Release|Any CPU
 		{1EDF4CE3-0857-4AD9-A711-F42AD1FBB15D}.Release|x86.ActiveCfg = Release|Any CPU
 		{1EDF4CE3-0857-4AD9-A711-F42AD1FBB15D}.Release|x86.Build.0 = Release|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Debug|x64.Build.0 = Debug|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Debug|x86.Build.0 = Debug|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Release|x64.ActiveCfg = Release|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Release|x64.Build.0 = Release|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Release|x86.ActiveCfg = Release|Any CPU
+		{0B906FB1-5D58-4A7A-ADDD-70586F650C2F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
