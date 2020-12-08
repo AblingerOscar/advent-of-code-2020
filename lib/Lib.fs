@@ -47,3 +47,11 @@ let waitForUser () =
             doUntil f expected
 
     doUntil System.Console.ReadKey 'e'
+
+
+module Seq =
+    let index source = Seq.mapi (fun i c -> (i, c)) source
+
+module Map =
+    let ofIndexSeq<'t> : seq<'t> -> Map<int, 't> =
+        Seq.index >> Map.ofSeq
