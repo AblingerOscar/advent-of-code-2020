@@ -1,8 +1,9 @@
-﻿open System
+﻿open Lib
+open System
 
 // part 1
-let getData () = seq {
-    let lines = System.IO.File.ReadLines "data/source.txt"
+let getData argv = seq {
+    let lines = System.IO.File.ReadLines (getFileName argv)
 
     let mutable result = ""
     
@@ -20,8 +21,8 @@ let getData () = seq {
 let getCntOfDiffAnswers answers = (Set.ofSeq answers).Count
 
 // part 2
-let getData2 () = seq {
-    yield! Lib.readEmptyLineSeparatedSections "data/source.txt"
+let getData2 argv = seq {
+    yield! readEmptyLineSeparatedSections (getFileName argv)
 }
 
 let getCntOfSameAnswers answers =
@@ -32,13 +33,13 @@ let getCntOfSameAnswers answers =
 [<EntryPoint>]
 let main argv =
     // part 1
-    getData ()
+    getData argv
     |> Seq.map getCntOfDiffAnswers
     |> Seq.reduce (+)
     |> printfn "Sum of counts (any yes): %d"
 
     // part 2
-    getData2 ()
+    getData2 argv
     |> Seq.map getCntOfSameAnswers
     |> Seq.reduce (+)
     |> printfn "Sum of counts (all yes): %d"

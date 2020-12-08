@@ -1,4 +1,5 @@
-﻿open System
+﻿open Lib
+open System
 open System.Text.RegularExpressions
 
 let tupleAdd (a, b) c = a, b, c
@@ -53,8 +54,8 @@ let requiredEntryFunc = Map.empty
 let allEntries = requiredEntries.Add "cid"
 let twoNewlinesRegex = Regex("\n\r\n\r|\n\n|\r\r|\r\n\r\n")
 
-let getData () = seq {
-    let text = System.IO.File.ReadAllText "data/source.txt"
+let getData argv = seq {
+    let text = System.IO.File.ReadAllText (getFileName argv)
 
     yield! twoNewlinesRegex.Split text
             |> Seq.map (fun entries ->
@@ -93,11 +94,11 @@ let isValid3 (passport: Map<string, string>) =
 [<EntryPoint>]
 let main argv =
     let numberOfValidPassports =
-        getData ()
+        getData argv
         |> Seq.filter isValid2
         |> Seq.length
     
     printfn "Found %d valid passports" numberOfValidPassports
 
-    Lib.waitForUser ()
+    waitForUser ()
     0 // return an integer exit code

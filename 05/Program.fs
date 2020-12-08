@@ -1,7 +1,7 @@
-﻿open System
+﻿open Lib
 
-let getData () = seq {
-    yield! System.IO.File.ReadLines "data/source.txt"
+let getData argv = seq {
+    yield! System.IO.File.ReadLines (getFileName argv)
 }
 
 let getSeat seatDescriptor =
@@ -21,7 +21,7 @@ let calcSeatId (r, c) = r * 8 + c
 [<EntryPoint>]
 let main argv =
     let seatIds =
-        getData ()
+        getData argv
         |> Seq.map (Seq.toList >> getSeat >> calcSeatId)
         |> Seq.toList
         |> List.sort

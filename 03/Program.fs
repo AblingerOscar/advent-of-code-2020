@@ -7,8 +7,8 @@ type Forest (bitArrays: BitArray list) =
     member _.IsEnd y = y >= height
     member _.IsTree x y = bitArrays.[y].[x % width]
 
-let getData () = 
-    let lines = System.IO.File.ReadLines "data/source.txt"
+let getData argv = 
+    let lines = System.IO.File.ReadLines (getFileName argv)
 
     Forest [
         for line in lines do
@@ -33,7 +33,7 @@ let step dx dy forest x y =
 
 [<EntryPoint>]
 let main argv =
-    let forest = getData ()
+    let forest = getData argv
     
     printfn "While sloping using the (3 1) pattern I hit %d trees" (step 3 1 forest 0 0)
     

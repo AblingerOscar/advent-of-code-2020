@@ -54,7 +54,7 @@ let secondPart numbers =
 
 [<EntryPoint>]
 let main argv =
-    let numbers = System.IO.File.ReadLines "data/source.txt"
+    let numbers = System.IO.File.ReadLines (getFileName argv)
                     |> List.ofSeq
                     |> List.map int
 

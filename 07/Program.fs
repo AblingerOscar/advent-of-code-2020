@@ -4,7 +4,7 @@ type BagWithCount = int * string
 type Bags = BagWithCount list
 type BagDefinition = string * Bags
 
-let getData () : seq<BagDefinition> =
+let getData argv : seq<BagDefinition> =
     let description = "(?<name>\w+ \w+)"
     let inner = sprintf "^ *(?<amount>\d+) %s bags?" description
     let regex = sprintf "^(?<container>\w+ \w+) bags contain (no other bags|(?<bags>\d+ %s bags?(, \d+ %s bags?)*))\.$" description description
@@ -14,7 +14,7 @@ let getData () : seq<BagDefinition> =
         |> Seq.map (regexMap inner (fun map -> (int map.["amount"]), map.["name"]))
         |> Seq.toList
 
-    System.IO.File.ReadLines "data/source.txt"
+    System.IO.File.ReadLines (getFileName argv)
     |> Seq.map (regexMap regex (fun map ->
         let bags = match map.Item "bags" with
                     | "" -> List.empty
@@ -43,7 +43,7 @@ let rec recCalcContents (bagDefs: Map<string, Bags>) container =
 
 [<EntryPoint>]
 let main argv =
-    let data = Seq.cache (getData ())
+    let data = Seq.cache (getData argv)
     let dataMap = (Map.ofSeq data)
 
     // part 1

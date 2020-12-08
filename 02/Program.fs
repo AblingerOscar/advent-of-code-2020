@@ -26,8 +26,8 @@ let parsePassword group =
     with
         _ -> None
 
-let getData () = seq {
-    let lines = System.IO.File.ReadLines "data/source.txt"
+let getData argv = seq {
+    let lines = System.IO.File.ReadLines (getFileName argv)
 
     for line in lines do
         let m = Regex.Match(line, "(\d+)-(\d+) ([a-z]): (.*)")
@@ -46,7 +46,7 @@ let main argv =
 
     let mutable cnt = 0
 
-    for password in getData() do
+    for password in getData argv do
         if password.IsValidV2 then
             cnt <- cnt + 1
     
