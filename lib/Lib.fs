@@ -1,6 +1,7 @@
 ﻿module Lib
 
 open System
+open System.Text.RegularExpressions
 
 let splitBy f input =
     let i = ref 0
@@ -23,7 +24,14 @@ let splitAt f input =
 let readEmptyLineSeparatedSections fileName =
     System.IO.File.ReadLines fileName
     |> splitAt ((=) "")
-    
+
+let regexMap regex transform source =
+    let groupMap = Regex(regex).Match(source).Groups
+                   |> Seq.skip 1
+                   |> Seq.filter (fun group -> not (Seq.forall Char.IsDigit group.Name))
+                   |> Seq.map (fun group -> group.Name, group.Value)
+                   |> Map.ofSeq
+    transform groupMap
 
 let waitForUser () =
     printfn "Finished. Press 'e' to exit the program…"
