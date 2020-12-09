@@ -3,6 +3,11 @@
 open System
 open System.Text.RegularExpressions
 
+let opt<'t> (tup: bool * 't) =
+    match tup with
+    | true, v -> Some v
+    | false, _ -> None
+
 let splitBy f input =
     let i = ref 0
     input
