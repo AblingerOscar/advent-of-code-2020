@@ -56,6 +56,21 @@ let waitForUser () =
 
 module Seq =
     let index source = Seq.mapi (fun i c -> (i, c)) source
+    let mapt f (source: seq<'a * 'b>) = Seq.map (fun (a, b) -> f a b) source
+
+    let triplewise (source: seq<_>) = seq {
+        use e = source.GetEnumerator()
+        if e.MoveNext () then
+            let a = ref e.Current
+            if e.MoveNext () then
+                let b = ref e.Current
+                while e.MoveNext () do
+                    let c = e.Current
+                    yield (!a, !b, c)
+                    a := !b
+                    b := c
+    }
+
 
 module Map =
     let ofIndexSeq<'t> : seq<'t> -> Map<int, 't> =
