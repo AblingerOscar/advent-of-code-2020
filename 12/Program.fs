@@ -9,6 +9,11 @@ type Degree =
     | D90
     | D180
     | D270
+    static member (~-) (d: Degree) =
+        match d with
+        | D90 -> D270
+        | D180 -> D180
+        | D270 -> D90
 
 let parseDegree n =
     match Int32.Parse n with 
@@ -40,7 +45,11 @@ let getData argv =
         | _ -> failwithf "invalid input '%s'" line
         )
 
-let turnR90 ((x, y): Direction) = y, -x
+let turnR (direction: Degree) ((x, y): int * int) =
+        match direction with
+        | D90  -> ( y, -x)
+        | D180 ->(-x, -y)
+        | D270 ->(-y,  x)
 
 let move (ship: Ship) (instruction: Instruction): Ship =
     let (x, y, (dx, dy)) = ship
@@ -49,16 +58,8 @@ let move (ship: Ship) (instruction: Instruction): Ship =
     | East n -> x+n, y, (dx, dy)
     | South n -> x, y-n, (dx, dy)
     | West n -> x-n, y, (dx, dy)
-    | Left n ->
-        match n with
-        | D90 -> x, y, ((dx, dy) |> turnR90 |> turnR90 |> turnR90)
-        | D180 -> x, y, ((dx, dy) |> turnR90 |> turnR90)
-        | D270 -> x, y, ((dx, dy) |> turnR90)
-    | Right n ->
-        match n with
-        | D90 -> x, y, ((dx, dy) |> turnR90)
-        | D180 -> x, y, ((dx, dy) |> turnR90 |> turnR90)
-        | D270 -> x, y, ((dx, dy) |> turnR90 |> turnR90 |> turnR90)
+    | Left direction -> x, y, (turnR -direction (dx, dy))
+    | Right direction -> x, y, (turnR direction (dx, dy))
     | Forward n -> x+dx*n, y+dy*n, (dx, dy)
 
 type ShipWithWaypoint = (int*int) * (int*int) // ship (x,y) * waypoint (x, y)
@@ -70,18 +71,9 @@ let move2 ((ship, (wx, wy)): ShipWithWaypoint) (instruction: Instruction): ShipW
     | East n -> ship, (wx+n, wy)
     | South n -> ship, (wx, wy-n)
     | West n -> ship, (wx-n, wy)
+    | Left direction -> ship, (turnR -direction (wx, wy))
+    | Right direction -> ship, (turnR direction (wx, wy))
     | Forward n -> ((sx + wx * n), (sy + wy*n)), (wx, wy)
-    | Left n ->
-        match n with
-        | D90 -> ship, (-wy, wx)
-        | D180 -> ship, (-wx, -wy)
-        | D270 -> ship, (wy, -wx)
-    | Right n ->
-        match n with
-        | D90 -> ship, (wy, -wx)
-        | D180 -> ship, (-wx, -wy)
-        | D270 -> ship, (-wy, wx)
-    
 
 [<EntryPoint>]
 let main argv =
@@ -94,6 +86,7 @@ let main argv =
     let ((x, y), _) =
         getData argv
         |> Seq.fold move2 ((0, 0), (10, 1))
-
+    
     printfn "%d" ((abs x) + (abs y))
+    
     0
