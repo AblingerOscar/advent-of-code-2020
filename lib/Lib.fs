@@ -53,7 +53,6 @@ let waitForUser () =
 
     doUntil System.Console.ReadKey 'e'
 
-
 module Seq =
     let index source = Seq.mapi (fun i c -> (i, c)) source
     let mapt f (source: seq<'a * 'b>) = Seq.map (fun (a, b) -> f a b) source

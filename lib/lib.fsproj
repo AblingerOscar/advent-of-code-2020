@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ActivePatterns.fs" />
     <Compile Include="Lib.fs" />
   </ItemGroup>
 </Project>
