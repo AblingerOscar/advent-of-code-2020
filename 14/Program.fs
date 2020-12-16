@@ -8,6 +8,7 @@ type Mask =
     struct
         val ones: int64
         val zeroes: int64
+        val floatingDigits: int list
 
         new (mask: string) =
             let applyChToNumber (ones, zeroes) (i, ch) =
@@ -17,15 +18,37 @@ type Mask =
                 | '1' -> ones + (1L <<< i), zeroes
                 | _ -> failwithf "invalid mask character found: '%c'" ch
  
-            let (o, z) =
+            let indexedReversedMask =
                 mask
                 |> Seq.rev
                 |> Seq.indexed
+
+            let floatingDigits =
+                indexedReversedMask
+                |> Seq.filter (snd >> (=) 'X')
+                |> Seq.map fst
+                |> List.ofSeq
+
+            let (o, z) =
+                indexedReversedMask
                 |> Seq.fold applyChToNumber (0L, 0L)
 
-            {ones = o; zeroes = z}
+            {ones = o; zeroes = z; floatingDigits = floatingDigits}
             
         member x.apply (n: int64): int64 = ~~~(~~~(n ||| x.ones) ||| x.zeroes)
+
+        member x.allVariatonsWithFloating (number: int64): int64 seq =
+            let num = number ||| x.ones
+
+            let rec recFloatIndex (n: int64) (indexes: int list) = seq {
+                match indexes with
+                | [] -> yield n
+                | idx::tail ->
+                    yield! recFloatIndex n tail
+                    yield! recFloatIndex (n ^^^ (1L <<< idx)) tail
+            }    
+
+            recFloatIndex num x.floatingDigits
 
         static member none = Mask ""
     end
@@ -50,8 +73,34 @@ let main argv =
         | MaskDefinition newMask -> Mask newMask, memory
         | MemoryAssignment (pos, value) -> (mask, memory.Add(pos, (mask.apply value)))
 
+    // part 1
     getData argv
     |> Seq.fold folder (Mask.none, Map.empty)
+    |> snd
+    |> Map.fold (fun state _ v -> state + v) 0L
+    |> printfn "%d"
+
+
+    // part 2
+    let rec addAtAllIndices (map: Map<int64, int64>) value (indices: int64 list) =
+        match indices with
+        | [] -> map
+        | idx::tail -> addAtAllIndices (map.Add (idx, value)) value tail
+
+    let folder2 ((mask, memory): Mask * Map<int64, int64>) (statement: Statement) =
+        match statement with
+        | MaskDefinition newMask -> Mask newMask, memory
+        | MemoryAssignment (pos, value) ->
+            let newMap =
+                int64 pos
+                |> mask.allVariatonsWithFloating
+                |> List.ofSeq
+                |> addAtAllIndices memory value
+
+            (mask, newMap)
+
+    getData argv
+    |> Seq.fold folder2 (Mask.none, Map.empty)
     |> snd
     |> Map.fold (fun state _ v -> state + v) 0L
     |> printfn "%d"
