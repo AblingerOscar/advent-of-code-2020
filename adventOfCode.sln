@@ -37,6 +37,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc15", "15\aoc15.fsproj", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc16", "16\aoc16.fsproj", "{053C73D4-75A2-41FE-BB37-02E91583145A}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc17", "17\aoc17.fsproj", "{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -254,5 +256,17 @@ Global
 		{053C73D4-75A2-41FE-BB37-02E91583145A}.Release|x64.Build.0 = Release|Any CPU
 		{053C73D4-75A2-41FE-BB37-02E91583145A}.Release|x86.ActiveCfg = Release|Any CPU
 		{053C73D4-75A2-41FE-BB37-02E91583145A}.Release|x86.Build.0 = Release|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Debug|x64.Build.0 = Debug|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Debug|x86.Build.0 = Debug|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Release|x64.ActiveCfg = Release|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Release|x64.Build.0 = Release|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Release|x86.ActiveCfg = Release|Any CPU
+		{BE22C6DF-D96E-48D4-8B43-C1D5D785265E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
