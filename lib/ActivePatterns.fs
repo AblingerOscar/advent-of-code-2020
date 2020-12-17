@@ -16,3 +16,13 @@ let (|MatchesRegex2|_|) (regex: string) (input: string) =
     else
         None
 
+let (|MatchesRegexAll|_|) (regex: string) (input: string) =
+    let m = Regex.Match(input, regex)
+    if m.Success then
+        m.Groups
+        |> Seq.skip 1
+        |> Seq.map (fun i -> i.Value)
+        |> List.ofSeq
+        |> Some
+    else
+        None
