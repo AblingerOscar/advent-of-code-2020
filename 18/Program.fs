@@ -42,10 +42,66 @@ let evaluate1 (tokens: Token list) =
 
     calc [0L] [(+)] tokens
 
+let evaluate2 (tokens: Token list) =
+    let replaceRanges (list: 'a list) (ranges: (int * int * 'a) list): 'a list =
+        ranges
+        |> List.rev
+        |> List.fold (fun newTokens (l, r, v) -> newTokens.[..l - 1] @ [v] @ newTokens.[r + 1..]) list
+
+    let calcWithNoParentesis tokens =
+        let aggregateAdditions tokens =
+            tokens
+            |> List.choose (fun token ->
+                match token with
+                | Number n -> Some n
+                | _ -> None)
+            |> List.reduce (+)
+
+        tokens
+        |> List.splitWhen ((=) Mult)
+        |> List.map aggregateAdditions
+        |> List.reduce (*)
+ 
+ 
+    let rec calculateWithParenthesis (tokens: Token list) =
+        let innerParenthesisIndexes =
+            tokens
+            |> List.indexed
+            |> List.choose (fun (i, token) ->
+                match token with
+                | LParens | RParens -> Some (i, token)
+                | _ -> None
+            )
+
+        if innerParenthesisIndexes.IsEmpty then
+            calcWithNoParentesis tokens
+        else
+            innerParenthesisIndexes
+            |> List.pairwise
+            |> List.filter (fun (a, b) -> (snd a, snd b) = (LParens, RParens))
+            |> List.map (fun (a, b) -> (fst a, fst b))
+            |> List.map (fun (l, r) -> l, r, calcWithNoParentesis tokens.[l + 1 .. r - 1])
+            |> List.map (fun (l, r, v) -> (l, r, Number v))
+            |> replaceRanges tokens
+            |> calculateWithParenthesis
+
+    calculateWithParenthesis tokens
+
+let echo pattern value =
+    printfn pattern value
+    value
+
 [<EntryPoint>]
 let main argv =
+    // part 1
     getData argv
     |> Seq.map evaluate1
+    |> Seq.reduce (+)
+    |> printfn "%d"
+
+    // part 2
+    getData argv
+    |> Seq.map evaluate2
     |> Seq.reduce (+)
     |> printfn "%d"
 
