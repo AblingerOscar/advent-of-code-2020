@@ -1,6 +1,6 @@
 ﻿open Lib
 open System
-open System.Collections.Generic
+open FSharpx.Collections
 
 let getData argv =
     readEmptyLineSeparatedSections (getFileName argv)
@@ -9,28 +9,18 @@ let getData argv =
     |> (fun sequences -> (Seq.head sequences, Seq.head (Seq.tail sequences)))
 
 let playGameUntilEnd ((player1, player2): seq<int> * seq<int>): list<int> * list<int> =
-    // ugly procedural code :(
-    let queue1 = Queue<int> player1
-    let queue2 = Queue<int> player2
-    
-    let rec play (): unit =
-        if queue1.Count = 0 || queue2.Count = 0 then
-            ()
+    // nice functional code
+    let rec play (q1: Queue<int>) (q2: Queue<int>): (Queue<int> * Queue<int>) =
+        if q1.IsEmpty || q2.IsEmpty then
+            (q1, q2)
         else
-            match queue1.Dequeue(), queue2.Dequeue() with
-            | x, y when x > y ->
-                queue1.Enqueue x
-                queue1.Enqueue y
-                play ()
-            | x, y when x < y ->
-                queue2.Enqueue y
-                queue2.Enqueue x
-                play ()
+            match q1.Uncons, q2.Uncons with
+            | (h1,t1), (h2, t2) when h1 > h2 -> play (t1.Conj(h1).Conj(h2)) t2
+            | (h1,t1), (h2, t2) when h1 < h2 -> play t1 (t2.Conj(h2).Conj(h1))
             | _ -> failwithf "apparently two cards have the same value"
 
-    play ()
-
-    (List.ofSeq queue1, List.ofSeq queue2)
+    play (Queue.ofSeq player1) (Queue.ofSeq player2)
+    |> (fun (q1, q2) -> (List.ofSeq q1, List.ofSeq q2))
 
 [<EntryPoint>]
 let main argv =
