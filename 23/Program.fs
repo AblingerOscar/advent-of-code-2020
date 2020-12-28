@@ -79,7 +79,7 @@ let printListStartingFrom1 (list: int list) =
 
     printfn ""
 
-// part 2 functions
+// part 2 attempt 1 functions
 module LinkedList =
     let value (node: LinkedListNode<int>) = node.Value
     let cyclingNext (list: LinkedList<int>) (node: LinkedListNode<int>) =
@@ -133,6 +133,44 @@ let playNRoundsLL (n: int) (list: LinkedList<int>) (startNode: LinkedListNode<in
         if i % 100_000 = 0 then
             printfn "update: %d%%" (i/100_000)
    
+// part 2 attempt 2 functions
+
+let rec getDestinationCupFast (currPos: int) (max: int) (exclude: Set<int>) =
+    if currPos <= 0 then
+        getDestinationCupFast max max exclude
+    else if exclude.Contains (currPos-1) then
+        getDestinationCupFast (currPos-1) max exclude
+    else
+        currPos - 1
+
+let getNextThreeFast (array: inref<int[]>) (pos: int) =
+    let mutable curr = array.[pos]
+    let first = curr
+    curr <- array.[curr]
+    let second = curr
+    curr <- array.[curr]
+    let third = curr
+    
+    [ first; second; third ], array.[curr]
+
+let playOneRoundFast (array: inref<int[]>) (pos: int) =
+    let nextThree, after = getNextThreeFast &array pos
+    let destination = getDestinationCupFast pos array.Length (Set.ofList nextThree)
+
+    // skip the three selected ones
+    array.SetValue(after, pos)
+    // connect the end of the selected ones with the element after the destination
+    array.SetValue(array.[destination], nextThree.[2])
+    // set destination to point to selected ones
+    array.SetValue(nextThree.[0], destination)
+
+let rec playNRoundsFast (n: int) (array: inref<int[]>) (startPosition: int) =
+    if n = 1 then
+        playOneRoundFast &array startPosition
+    else
+        playOneRoundFast &array startPosition
+        playNRoundsFast (n-1) &array array.[startPosition]
+
 [<EntryPoint>]
 let main argv =
     let data = getData argv
@@ -144,6 +182,7 @@ let main argv =
     |> printListStartingFrom1
 
     // part 2 – attempt 1: linked list
+    (*
     let list = LinkedList<int> (data @ [ 10 .. 1_000_000 ])
     playNRoundsLL 10_000_000 list list.First
 
@@ -151,5 +190,24 @@ let main argv =
     |> List.map LinkedList.value
     |> List.reduce (*)
     |> printfn "%d"
+    *)
 
+    // part 2 – attempt 2: array
+    let mutable array = [|
+        for i in 0 .. 999_998 do
+            yield i + 1
+        yield -1
+    |]
+    let prepData = List.map (fun i -> i - 1) data
+    for curr, succ in List.pairwise prepData do
+        array.SetValue(succ, curr)
+    array.SetValue(9, List.last prepData)
+    array.SetValue(List.head prepData, array.Length - 1)
+
+    // play
+    playNRoundsFast 10_000_000 &array (List.head prepData)
+    
+    let a = array.[0]
+    let b = array.[a]
+    printfn "%d" (int64 (a+1) * int64 (b+1))
     0
