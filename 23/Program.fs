@@ -1,5 +1,6 @@
 ﻿open Lib
 open System
+open System.Collections.Generic
 
 let getData argv =
     let charToInt c = int c - int '0'
@@ -53,12 +54,6 @@ let playOneRound list currIdx =
     else
         newList.[..destination] @ selected @ newList.[destination + 1..]
 
-// only for debugging
-let printlist list =
-    for i in list do
-        printf "%d" i
-    printfn ""
-
 let rec playNTimes startIdx times (list: int list) =
     let getNextId newList =
         newList
@@ -84,6 +79,60 @@ let printListStartingFrom1 (list: int list) =
 
     printfn ""
 
+// part 2 functions
+module LinkedList =
+    let value (node: LinkedListNode<int>) = node.Value
+    let cyclingNext (list: LinkedList<int>) (node: LinkedListNode<int>) =
+        match node.Next with
+        | null -> list.First
+        | next -> next
+
+    let takeAfter (n: int) (node: LinkedListNode<int>) (list: LinkedList<int>) =
+        [
+            let mutable currNode = node
+            for _ in 0..n do
+                currNode <- cyclingNext list currNode
+                yield currNode
+        ]
+
+    let moveManyAfter (afterNode: LinkedListNode<int>) (list: LinkedList<int>) (toAddNodes: LinkedListNode<int> list) =
+        let mutable curr = afterNode
+        for newNode in toAddNodes do
+            list.Remove newNode
+            list.AddAfter(curr, newNode)
+            curr <- newNode
+
+let playOneRoundLL (list: LinkedList<int>) (currNode: LinkedListNode<int>) =
+    let removed =
+        list
+        |> LinkedList.takeAfter 3 currNode
+    
+    let removedVals =
+        removed
+        |> List.map (fun node -> node.Value)
+        |> Set.ofList
+
+    let mutable destinationVal = currNode.Value - 1
+    if destinationVal = 0 then
+        destinationVal <- 1_000_000
+    while removedVals.Contains destinationVal do
+        destinationVal <- destinationVal - 1
+        if destinationVal = 0 then
+            destinationVal <- 1_000_000
+
+    let destination = list.Find destinationVal
+
+    LinkedList.moveManyAfter destination list removed
+
+let playNRoundsLL (n: int) (list: LinkedList<int>) (startNode: LinkedListNode<int>) =
+    let mutable currNode = startNode
+    for i in 0..n do
+        playOneRoundLL list currNode
+        currNode <- LinkedList.cyclingNext list currNode
+
+        if i % 100_000 = 0 then
+            printfn "update: %d%%" (i/100_000)
+   
 [<EntryPoint>]
 let main argv =
     let data = getData argv
@@ -94,14 +143,13 @@ let main argv =
     |> snd
     |> printListStartingFrom1
 
-    // part 2
-    let (idx, list) =
-        data @ [ 10 .. 1_000_000 ]
-        |> playNTimes 0 10_000_000
+    // part 2 – attempt 1: linked list
+    let list = LinkedList<int> (data @ [ 10 .. 1_000_000 ])
+    playNRoundsLL 10_000_000 list list.First
 
-    let a = list.[idx]
-    let b = list.[(idx + 1) % list.Length]
-
-    printfn "%d * %d = %d" a b (a*b)
+    LinkedList.takeAfter 2 (list.Find 1) list
+    |> List.map LinkedList.value
+    |> List.reduce (*)
+    |> printfn "%d"
 
     0
