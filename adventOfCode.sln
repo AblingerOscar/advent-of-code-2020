@@ -47,6 +47,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc21", "21\aoc21.fsproj", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc22", "22\aoc22.fsproj", "{314A067F-7384-4C10-B0B9-E951A1B8C481}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "aoc23", "23\aoc23.fsproj", "{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -324,5 +326,17 @@ Global
 		{314A067F-7384-4C10-B0B9-E951A1B8C481}.Release|x64.Build.0 = Release|Any CPU
 		{314A067F-7384-4C10-B0B9-E951A1B8C481}.Release|x86.ActiveCfg = Release|Any CPU
 		{314A067F-7384-4C10-B0B9-E951A1B8C481}.Release|x86.Build.0 = Release|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Debug|x64.Build.0 = Debug|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Debug|x86.Build.0 = Debug|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Release|x64.ActiveCfg = Release|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Release|x64.Build.0 = Release|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Release|x86.ActiveCfg = Release|Any CPU
+		{5CB2EAFF-AC1E-4300-B0EF-B86ADDFF9916}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
