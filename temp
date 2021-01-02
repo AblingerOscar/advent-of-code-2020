@@ -1,0 +1,128 @@
+diff --git a/20/Program.fs b/20/Program.fs
+index c8a5283..2f52aa4 100644
+--- a/20/Program.fs
++++ b/20/Program.fs
+@@ -1,6 +1,7 @@
+ ﻿open ActivePatterns
+ open Lib
+ open System
++open System.Text.RegularExpressions
+ 
+ let getData argv =
+     let parseSection (str: string seq) =
+@@ -41,13 +42,12 @@ let flipText (text: string list) =
+     else
+         List.rev text
+ 
+-let getTopEdge text = List.head text
+-let getBottomEdge text = List.last text
+-let getLeftEdge (text: string list) = text |> List.map (fun line -> line.[0]) |> String.Concat
+-let getRightEdge (text: string list) = text |> List.map (fun line -> line.[line.Length - 1]) |> String.Concat
++let getBottomEdge text = List.head text
++let getTopEdge text = List.last text
++let getRightEdge (text: string list) = text |> List.map (fun line -> line.[0]) |> String.Concat
++let getLeftEdge (text: string list) = text |> List.map (fun line -> line.[line.Length - 1]) |> String.Concat
+ 
+-// pretty inefficient, but it works
+-let transformToMatch (getEdge: string list -> string) (edge: string) (text: string list) =
++let getAllVariationsOfText (text: string list) =
+     seq {
+         yield text // normal text
+         // rotated text
+@@ -65,6 +65,10 @@ let transformToMatch (getEdge: string list -> string) (edge: string) (text: stri
+         yield text |> rotateTextLeft |> flipText |> rotateTextLeft |> rotateTextLeft
+         yield text |> rotateTextLeft |> flipText |> rotateTextLeft |> rotateTextLeft |> rotateTextLeft
+     }
++
++// pretty inefficient, but it works
++let transformToMatch (getEdge: string list -> string) (edge: string) (text: string list) =
++    getAllVariationsOfText text
+     |> Seq.tryPick (fun transformedText ->
+             if (getEdge transformedText) = edge then
+                 Some transformedText
+@@ -153,10 +157,52 @@ let assembleTiles (tileIdsToTexts: Map<int, string list>) =
+     tileList
+     |> List.map (List.map (fun tile -> tile.Id, tile.Text))
+ 
+-let printTile text =
+-    for line in text do
+-        printfn "%s" line
+-    printfn ""
++// part 2
++let extractPicture (tiles: string list list list) =
++    let lines = 
++        [
++            for tileRow in tiles do
++                for y in 1 .. tileRow.[0].Length - 2 do
++                    yield
++                        [
++                            for tile in tileRow do
++                                yield tile.[y].Substring(1, tile.[y].Length - 2)
++                        ]
++        ]
++    lines
++    |> List.map (List.reduce (+))
++
++let findSeaMonsterEndLineOccurances str =
++    (Regex ".#..#..#..#..#..#...").Matches str
++    |> Seq.map (fun mat -> mat.Index)
++
++let confirmSeamonsterAt (picture: string list) (bottomLineIdx, charIdx) =
++    bottomLineIdx > 1
++    && picture.[bottomLineIdx - 2].[charIdx + 18] = '#'
++    && ((Regex "#....##....##....###").Matches picture.[bottomLineIdx - 1]) |> Seq.map (fun mat -> mat.Index) |> Set.ofSeq |> Set.contains charIdx
++
++let getNrOfSeaMonsters (picture: string list) =
++    let getNrOfSeaMonstersInSpecificPicture (specificPic: string list) =
++        specificPic
++        |> Seq.ofList
++        |> Seq.indexed
++        |> Seq.skip 2
++        |> Seq.collect (fun (lineIdx, text) ->
++            findSeaMonsterEndLineOccurances text
++            |> Seq.map (fun charIdx -> lineIdx, charIdx)
++            )
++        |> Seq.filter (confirmSeamonsterAt specificPic)
++        |> Seq.length
++
++    getAllVariationsOfText picture
++    |> Seq.map getNrOfSeaMonstersInSpecificPicture
++    |> Seq.max
++
++let getNrOfBlackPixels (picture: string list) =
++    picture
++    |> Seq.collect id
++    |> Seq.filter ((=) '#')
++    |> Seq.length
+ 
+ [<EntryPoint>]
+ let main argv =
+@@ -172,4 +218,17 @@ let main argv =
+ 
+     printfn "%d" (tl * tr * bl * br)
+ 
++    // part 2
++    let picture =
++        assembledTiles
++        |> List.map (List.map snd)
++        |> extractPicture
++ 
++    let BLACK_PIXELS_PER_SEAMONSTER = 15
++
++    let nrOfSM = getNrOfSeaMonsters picture
++    let nrOfBlackPixels = getNrOfBlackPixels picture
++
++    printfn "%d" (nrOfBlackPixels - (nrOfSM * BLACK_PIXELS_PER_SEAMONSTER))
++
+     0
+diff --git a/20/data/source.txt b/20/data/source.txt
+index 5477bc0..3cad998 100644
+--- a/20/data/source.txt
++++ b/20/data/source.txt
+@@ -1724,4 +1724,4 @@ Tile 1151:
+ #...#....#
+ ..#....#..
+ ...#.....#
+-#.#..#.#..
+\ No newline at end of file
++#.#..#.#..

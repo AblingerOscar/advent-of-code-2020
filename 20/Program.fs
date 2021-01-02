@@ -1,6 +1,7 @@
 ﻿open ActivePatterns
 open Lib
 open System
+open System.Text.RegularExpressions
 
 let getData argv =
     let parseSection (str: string seq) =
@@ -41,13 +42,12 @@ let flipText (text: string list) =
     else
         List.rev text
 
-let getTopEdge text = List.head text
-let getBottomEdge text = List.last text
-let getLeftEdge (text: string list) = text |> List.map (fun line -> line.[0]) |> String.Concat
-let getRightEdge (text: string list) = text |> List.map (fun line -> line.[line.Length - 1]) |> String.Concat
+let getBottomEdge text = List.head text
+let getTopEdge text = List.last text
+let getRightEdge (text: string list) = text |> List.map (fun line -> line.[0]) |> String.Concat
+let getLeftEdge (text: string list) = text |> List.map (fun line -> line.[line.Length - 1]) |> String.Concat
 
-// pretty inefficient, but it works
-let transformToMatch (getEdge: string list -> string) (edge: string) (text: string list) =
+let getAllVariationsOfText (text: string list) =
     seq {
         yield text // normal text
         // rotated text
@@ -65,6 +65,10 @@ let transformToMatch (getEdge: string list -> string) (edge: string) (text: stri
         yield text |> rotateTextLeft |> flipText |> rotateTextLeft |> rotateTextLeft
         yield text |> rotateTextLeft |> flipText |> rotateTextLeft |> rotateTextLeft |> rotateTextLeft
     }
+
+// pretty inefficient, but it works
+let transformToMatch (getEdge: string list -> string) (edge: string) (text: string list) =
+    getAllVariationsOfText text
     |> Seq.tryPick (fun transformedText ->
             if (getEdge transformedText) = edge then
                 Some transformedText
@@ -153,10 +157,101 @@ let assembleTiles (tileIdsToTexts: Map<int, string list>) =
     tileList
     |> List.map (List.map (fun tile -> tile.Id, tile.Text))
 
-let printTile text =
-    for line in text do
-        printfn "%s" line
-    printfn ""
+// part 2
+let extractPicture (tiles: string list list list) =
+    let lines = 
+        [
+            for tileRow in tiles do
+                for y in 1 .. tileRow.[0].Length - 2 do
+                    yield
+                        [
+                            for tile in tileRow do
+                                yield tile.[y].Substring(1, tile.[y].Length - 2)
+                        ]
+        ]
+    lines
+    |> List.map (List.reduce (+))
+
+let allMatchIndices (regexStr: string) (search: string) =
+    let regex = Regex regexStr
+
+    let rec recAllMatchIndices list idx =
+        let mat = regex.Match(search, idx)
+        if mat.Success then
+            recAllMatchIndices (mat.Index::list) (mat.Index + 1)
+        else
+            List.rev list
+
+    recAllMatchIndices List.empty 0
+
+let findSeaMonsterEndLineOccurances str =
+    allMatchIndices ".#..#..#..#..#..#..." str
+
+let confirmSeamonsterAt (picture: string list) (bottomLineIdx, charIdx) =
+    bottomLineIdx > 1
+    && picture.[bottomLineIdx - 2].[charIdx + 18] = '#'
+    && allMatchIndices  "#....##....##....###" picture.[bottomLineIdx - 1] |> Set.ofSeq |> Set.contains charIdx
+
+let getNrOfSeaMonsters (picture: string list) =
+    let getNrOfSeaMonstersInSpecificPicture (specificPic: string list) =
+        specificPic
+        |> Seq.ofList
+        |> Seq.indexed
+        |> Seq.skip 2
+        |> Seq.collect (fun (lineIdx, text) ->
+            findSeaMonsterEndLineOccurances text
+            |> Seq.map (fun charIdx -> lineIdx, charIdx)
+            )
+        |> Seq.filter (confirmSeamonsterAt specificPic)
+        |> Seq.length
+
+    getAllVariationsOfText picture
+    |> Seq.map getNrOfSeaMonstersInSpecificPicture
+    |> Seq.max
+
+// bonus
+let markSeaMonsters (picture: string list) =
+    let putSeamonster (pic: Map<int, string>) ((lineIdx, charIdx): int * int) =
+        let replaceCharsAt (str: string) (charPos: Set<int>) =
+            str
+            |> String.mapi (fun i ch -> if charPos.Contains i then 'O' else ch)
+        
+        pic
+            .Add(lineIdx - 2, replaceCharsAt pic.[lineIdx - 2] (Set.singleton (charIdx + 18)))
+            .Add(lineIdx - 1, replaceCharsAt pic.[lineIdx - 1] ([0; 5; 6; 11; 12; 17; 18; 19] |> List.map ((+) charIdx) |> Set.ofList))
+            .Add(lineIdx, replaceCharsAt pic.[lineIdx] ([1; 4; 7; 10; 13; 16] |> List.map ((+) charIdx) |> Set.ofList))
+
+    let markSeaMonstersInSpecificPicture (specificPic: string list) =
+        let smIndices =
+            specificPic
+            |> Seq.ofList
+            |> Seq.indexed
+            |> Seq.skip 2
+            |> Seq.collect (fun (lineIdx, text) ->
+                findSeaMonsterEndLineOccurances text
+                |> Seq.map (fun charIdx -> lineIdx, charIdx)
+                )
+            |> Seq.filter (confirmSeamonsterAt specificPic)
+            |> List.ofSeq
+        if smIndices.Length = 0 then
+            None
+        else
+            Some (
+                smIndices
+                |> List.fold putSeamonster (specificPic |> Map.ofIndexSeq)
+                |> Map.toList
+                |> List.sortBy fst
+                |> List.map snd
+            )
+
+    getAllVariationsOfText picture
+    |> Seq.pick markSeaMonstersInSpecificPicture
+
+let getNrOfBlackPixels (picture: string list) =
+    picture
+    |> Seq.collect id
+    |> Seq.filter ((=) '#')
+    |> Seq.length
 
 [<EntryPoint>]
 let main argv =
@@ -171,5 +266,27 @@ let main argv =
     let br = assembledTiles |> List.last |> List.last |> fst |> int64
 
     printfn "%d" (tl * tr * bl * br)
+
+    // part 2
+    let picture =
+        assembledTiles
+        |> List.map (List.map snd)
+        |> extractPicture
+ 
+    let BLACK_PIXELS_PER_SEAMONSTER = 15
+
+    let nrOfSM = getNrOfSeaMonsters picture
+    let nrOfBlackPixels = getNrOfBlackPixels picture
+
+    printfn "%d" (nrOfBlackPixels - (nrOfSM * BLACK_PIXELS_PER_SEAMONSTER))
+
+    // for if you want to print them (replaces sea monsters with 'O')
+    //let printTile text =
+    //    for line in text do
+    //        printfn "%s" line
+    //    printfn ""
+
+    //printTile (markSeaMonsters picture)
+    //printfn "%d" (picture |> markSeaMonsters |> getNrOfBlackPixels)
 
     0

@@ -10,6 +10,7 @@
     <Content Include="data/*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="temp.txt" />
     <ProjectReference Include="..\lib\lib.fsproj">
       <Name>lib.fsproj</Name>
     </ProjectReference>
